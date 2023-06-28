@@ -23,8 +23,8 @@ public class ShapelessRecipeMixin {
         if (!(result.getItem() instanceof CobblestoneBlockItem)) {
             return result;
         }
-        int i = 0;
-        Ingredient ing = Ingredient.EMPTY;
+
+        ItemStack iItemStack = ItemStack.EMPTY;
         for (Ingredient ingredient : ingredients) {
             if (ingredient.isEmpty()) {
                 continue;
@@ -33,17 +33,12 @@ public class ShapelessRecipeMixin {
             if (!(itemStack.getItem() instanceof CobblestoneBlockItem)) {
                 return result;
             } else {
-                if (ing.isEmpty()) {
-                    ing = ingredient;
-                } else {
-                    return result;
+                if (iItemStack.isEmpty()) {
+                    iItemStack = ingredient.getItems()[0];
                 }
-
             }
-            i++;
         }
-        ItemStack item = ing.getItems()[0];
-        CompoundTag tag = item.getTag();
+        CompoundTag tag = iItemStack.getTag();
         if (tag == null) {
             return ItemStack.EMPTY;
         } else {

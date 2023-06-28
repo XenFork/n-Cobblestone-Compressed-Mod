@@ -27,45 +27,33 @@ public class ShapedRecipeMixin {
         if (!(result.getItem() instanceof CobblestoneBlockItem)) {
             return result;
         }
-        Ingredient ing = Ingredient.EMPTY;
+        ItemStack iItemStack = ItemStack.EMPTY;
         for (Ingredient recipeItem : recipeItems) {
             if (recipeItem.isEmpty()) return result;
             ItemStack itemStack = recipeItem.getItems()[0];
             if (!(itemStack.getItem() instanceof CobblestoneBlockItem)) {
                 return result;
             } else {
-                if (ing.isEmpty()) ing = recipeItem;
-                else {
-                    CompoundTag tag = ing.getItems()[0].getTag();
+                if (iItemStack.isEmpty()) {
+                    iItemStack = recipeItem.getItems()[0];
+                } else {
+                    CompoundTag tag = iItemStack.getTag();
                     CompoundTag tag1 = recipeItem.getItems()[0].getTag();
-                    if (tag == null) {
-                        if (tag1 != null) {
-                            return result;
-                        }
-                    } else {
-                        if (tag1 == null) {
-                            return result;
-                        } else {
-                            if (tag.contains("compressed")) {
-                                if (!tag1.contains("compressed")) {
-                                    return result;
-                                } else {
-                                    if (!(tag.getString("compressed").equals(tag1.getString("compressed")))) {
-                                        return result;
-                                    }
-                                }
-                            } else {
-                                if (tag1.contains("compressed")) {
-                                    return result;
-                                }
-                            }
-                        }
+                    if (tag == null && tag1 != null) return result;
+                    if (tag1 == null)
+                        return result;
+                    if (tag.contains("compressed") && (!tag.contains("compressed"))) return result;
+                    if (!(tag.getString("compressed").equals(tag1.getString("compressed")))) {
+                        return result;
+                    }
+                    if (tag1.contains("compressed")) {
+                        return result;
                     }
                 }
             }
         }
-        ItemStack itemStack = ing.getItems()[0];
-        CompoundTag tag = itemStack.getTag();
+
+        CompoundTag tag = iItemStack.getTag();
         if (tag == null) {
             CompoundTag compoundTag = new CompoundTag();
             compoundTag.putString("compressed", "1");
