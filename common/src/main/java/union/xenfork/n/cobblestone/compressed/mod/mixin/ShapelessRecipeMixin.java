@@ -20,7 +20,6 @@ public class ShapelessRecipeMixin {
 
     @Redirect(method = "assemble(Lnet/minecraft/world/inventory/CraftingContainer;Lnet/minecraft/core/RegistryAccess;)Lnet/minecraft/world/item/ItemStack;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;copy()Lnet/minecraft/world/item/ItemStack;"))
     private ItemStack assemble(ItemStack result) {
-        String integer = null;
         if (!(result.getItem() instanceof CobblestoneBlockItem)) {
             return result;
         }
@@ -34,31 +33,30 @@ public class ShapelessRecipeMixin {
             if (!(itemStack.getItem() instanceof CobblestoneBlockItem)) {
                 return result;
             } else {
-                ing = ingredient;
+                if (ing.isEmpty()) {
+                    ing = ingredient;
+                } else {
+                    return result;
+                }
+
             }
             i++;
         }
-        if (i == 1) {
-            if (ing.isEmpty()) {
-                return result;
+        ItemStack item = ing.getItems()[0];
+        CompoundTag tag = item.getTag();
+        if (tag == null) {
+            return ItemStack.EMPTY;
+        } else {
+            if (!tag.contains("compressed")) {
+                return ItemStack.EMPTY;
+            } else if (tag.getString("compressed").equals("0")) {
+                return ItemStack.EMPTY;
             } else {
-                ItemStack item = ing.getItems()[0];
-                CompoundTag tag = item.getTag();
-                if (tag == null) {
-                    return ItemStack.EMPTY;
-                } else {
-                    if (!tag.contains("compressed")) {
-                        return ItemStack.EMPTY;
-                    } else if (tag.getString("compressed").equals("0")) {
-                        return ItemStack.EMPTY;
-                    } else {
-                        tag.putString("compressed", StringInteger.minusOne(tag.getString("compressed")));
-                        result.setTag(tag);
-                        return result;
-                    }
-                }
+                CompoundTag compoundTag = tag.copy();
+                compoundTag.putString("compressed", StringInteger.minusOne(tag.getString("compressed")));
+                result.setTag(compoundTag);
+                return result;
             }
         }
-        return result;
     }
 }

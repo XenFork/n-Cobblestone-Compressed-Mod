@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import union.xenfork.n.cobblestone.compressed.mod.item.CobblestoneBlockItem;
+import union.xenfork.n.cobblestone.compressed.mod.util.StringInteger;
 
 @Mixin(ShapedRecipe.class)
 public class ShapedRecipeMixin {
@@ -22,31 +23,58 @@ public class ShapedRecipeMixin {
     NonNullList<Ingredient> recipeItems;
 
     @Redirect(method = "assemble(Lnet/minecraft/world/inventory/CraftingContainer;Lnet/minecraft/core/RegistryAccess;)Lnet/minecraft/world/item/ItemStack;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;copy()Lnet/minecraft/world/item/ItemStack;"))
-    private ItemStack assemble(ItemStack stack) {
-        int i = 0;
-        NonNullList<Ingredient> list = NonNullList.withSize(9, Ingredient.EMPTY);
-        for (Ingredient recipeItem : recipeItems) {
-            if (!recipeItem.isEmpty()) i++;
+    private ItemStack assemble(ItemStack result) {
+        if (!(result.getItem() instanceof CobblestoneBlockItem)) {
+            return result;
         }
-        System.out.println(i);
-
-//        String integer = null;
-//        for (Ingredient recipeItem : recipeItems) {
-//            CompoundTag tag = recipeItem.getItems()[0].getTag();
-//            if (tag != null) {
-//                if (tag.contains("compressed")) {
-//                    integer = tag.getString("compressed");
-//                }
-//            } else {
-//                if (integer == null) {
-//                    integer = "0";
-//                } else {
-//                    if (!integer.equals("0")) {
-//                        return ItemStack.EMPTY;
-//                    }
-//                }
-//            }
-//        }
-        return stack;
+        Ingredient ing = Ingredient.EMPTY;
+        for (Ingredient recipeItem : recipeItems) {
+            if (recipeItem.isEmpty()) return result;
+            ItemStack itemStack = recipeItem.getItems()[0];
+            if (!(itemStack.getItem() instanceof CobblestoneBlockItem)) {
+                return result;
+            } else {
+                if (ing.isEmpty()) ing = recipeItem;
+                else {
+                    CompoundTag tag = ing.getItems()[0].getTag();
+                    CompoundTag tag1 = recipeItem.getItems()[0].getTag();
+                    if (tag == null) {
+                        if (tag1 != null) {
+                            return result;
+                        }
+                    } else {
+                        if (tag1 == null) {
+                            return result;
+                        } else {
+                            if (tag.contains("compressed")) {
+                                if (!tag1.contains("compressed")) {
+                                    return result;
+                                } else {
+                                    if (!(tag.getString("compressed").equals(tag1.getString("compressed")))) {
+                                        return result;
+                                    }
+                                }
+                            } else {
+                                if (tag1.contains("compressed")) {
+                                    return result;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        ItemStack itemStack = ing.getItems()[0];
+        CompoundTag tag = itemStack.getTag();
+        if (tag == null) {
+            CompoundTag compoundTag = new CompoundTag();
+            compoundTag.putString("compressed", "1");
+            result.setTag(compoundTag);
+        } else {
+            CompoundTag compoundTag = tag.copy();
+            compoundTag.putString("compressed", StringInteger.addOne(tag.getString("compressed")));
+            result.setTag(compoundTag);
+        }
+        return result;
     }
 }
