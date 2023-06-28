@@ -1,0 +1,19 @@
+{
+  "result": {
+    "nbt": "{compressed:\"1\"}",
+    "item": "minecraft:cobblestone",
+    "type": "minecraft:item_nbt"
+  },
+  "group": "cobble_xn",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": {
+      "item": "minecraft:cobblestone"
+    }
+  }
+}
