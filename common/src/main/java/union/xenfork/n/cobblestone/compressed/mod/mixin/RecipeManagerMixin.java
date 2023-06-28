@@ -3,10 +3,13 @@ package union.xenfork.n.cobblestone.compressed.mod.mixin;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonElement;
 import net.minecraft.core.NonNullList;
+import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
@@ -39,6 +42,7 @@ public class RecipeManagerMixin {
                 NonNullList<Ingredient> recipeItems = NonNullList.withSize(9, Ingredient.of(itemStack));
 
                 ResourceLocation resourceLocation = new ResourceLocation("cobblestone_add_x%s".formatted(integer));
+                ShapedRecipeBuilder.shaped()
                 ShapedRecipe shapedRecipe = new ShapedRecipe(
                         resourceLocation,
                         cobblestoneAddXn,
