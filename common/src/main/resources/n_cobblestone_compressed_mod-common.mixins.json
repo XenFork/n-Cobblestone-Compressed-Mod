@@ -4,6 +4,7 @@
   "package": "union.xenfork.n.cobblestone.compressed.mod.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "ItemsMixin"
   ],
   "client": [
   ],
